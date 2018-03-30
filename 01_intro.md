@@ -108,7 +108,7 @@ provides a library that wraps over them called libdrm, which we'll be using.
 
 The path I gave before is actually the location of the kernel headers, which is
 not libdrm. The actual libdrm headers are `<xf86drm.h>` and `<xf86drmMode.h>`.
-It's just like that so everything is a bit more annoying.
+It's like that just to be more annoying.
 
 The pkg-config name is just libdrm.
 
