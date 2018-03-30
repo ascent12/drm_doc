@@ -163,8 +163,8 @@ This simply contains several arrays of handles to DRM objects.
 
 Our first, and probably most simple to understand DRM object is a connector.
 
-A connector is represents the actual physical connectors on your GPUs.  So if
-you have a DVI and HDMI connector on your GPU, they should each have their own
+A connector represents the actual physical connectors on your GPUs.  So if
+you have a DVI and HDMI-A connector on your GPU, they should each have their own
 DRM connector object.
 
 One surprising thing about connectors is that the number of them can actually
@@ -173,7 +173,7 @@ you're growing new connectors on your GPU, but with DisplayPort 1.2, there is a
 feature called Multi-Stream Transport (referred to as MST), where you can have
 multiple monitors going to a single physical connector, either with
 daisy-chaining or a hub. When a new one of these monitors is plugged in, they
-will appear as a separate DRM connector. So be careful to to make any
+will appear as a separate DRM connector. So be careful not to make any
 assumptions in your code about the number of connectors being fixed.
 
 We'll start by looping through all of the connectors and printing some
@@ -214,11 +214,12 @@ typedef struct _drmModeConnector {
 - `connector_type` tells us whether our connector is HDMI-A, DVI, DisplayPort,
 etc.
 - `connector_type_id` distinguishes between connectors of the same type, so if
-you have two HDMI connectors, one will be 1 and the other 2. We can use this
+you have two HDMI-A connectors, one will be 1 and the other 2. We can use this
 information to give our connectors a meaningful name, such as "HDMI-A-0".
-- `connector_type` is only an integer, so we'll write a convenience function to
+- `connection` tells us if there is a monitor plugged in.
+
+`connector_type` is only an integer, so we'll write a convenience function to
 get the corresponding string.  
-`connection` tells us if there is a monitor plugged in.
 
 ### Modes
 
