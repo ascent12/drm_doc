@@ -14,7 +14,7 @@ technologies and APIs constantly being added to make everything more efficient
 and give a better experience for the user. With this rapid growth, its sad
 to say that a lot of the documentation hasn't kept up, especially for people
 who are new to the system. You'll find bits and pieces of documentation around,
-but they're far and few between, and most of them only cover the old APIs or
+but they're few and far between, and most of them only cover the old APIs or
 are geared to people writing DRM kernel drivers.
 
 So I thought I would write a guide to write a DRM userspace program, using all
@@ -106,7 +106,7 @@ DRM is interacted with by using a series of ioctls, usually found in
 `/usr/include/libdrm`. Dealing with these ioctls is a pain in the ass, so Mesa
 provides a library that wraps over them called libdrm, which we'll be using.
 
-The path I gave before is actually the location of the kernel headers, which is
+The path I gave before is the location of the kernel headers, which is
 not libdrm. The actual libdrm headers are `<xf86drm.h>` and `<xf86drmMode.h>`.
 It's like that just to be more annoying.
 
