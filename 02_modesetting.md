@@ -165,7 +165,7 @@ typedef struct _drmModeEncoder {
 You can get the encoders that a connector can use from the `encoders` member of
 `drmModeConnector`.
 
-We can ignore most of the members, but the one important one for our purpose if
+We can ignore most of the members, but the important one for our purpose is
 `possible_crtcs`.  This value is a bitmask, and represent which CRTCs found in
 `drmModeRes` it is compatible with.
 
