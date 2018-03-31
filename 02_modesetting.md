@@ -281,14 +281,14 @@ drmModeAddFB2(drm_fd, width, height, DRM_FORMAT_XRGB8888,
 ```
 You'll notice that we're using arrays of 4 elements. This is because
 drmModeAddFB2 also supports multi-planar formats, which can have up to 4
-buffers. We only need the 1, so we can just set the other 3 to 0.
+buffers. We only need the first, so we can just set the others to zero.
 
 Now we have to prepare the buffer for being mmaped.
 ```c
 struct drm_mode_map_dumb map = { .handle = fb->handle };
 drmIoctl(drm_fd, DRM_IOCTL_MODE_MAP_DUMB, &map);
 ```
-And finally perform that mmap:
+And finally perform the mmap:
 ```c
 fb->data = mmap(0, fb->size, PROT_READ | PROT_WRITE, MAP_SHARED,
 	drm_fd, map.offset);
