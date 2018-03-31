@@ -151,7 +151,6 @@ the same mode.
 
 Encoders are responsible for taking the pixels from a CRTC, and encoding it into
 a format that a particular connector can use.
-first 
 
 ```c
 typedef struct _drmModeEncoder {
@@ -163,7 +162,7 @@ typedef struct _drmModeEncoder {
 } drmModeEncoder, *drmModeEncoderPtr;
 ```
 
-You can the encoders a connector can use from the `encoders` member of
+You can get the encoders that a connector can use from the `encoders` member of
 `drmModeConnector`.
 
 We can ignore most of the members, but the one important one for our purpose if
