@@ -276,7 +276,6 @@ uint32_t handles[4] = { fb->handle };
 uint32_t strides[4] = { fb->stride };
 uint32_t offsets[4] = { 0 };
 
-uint32_t fb_id;
 drmModeAddFB2(drm_fd, width, height, DRM_FORMAT_XRGB8888,
 	handles, strides, offsets, &fb->id, 0);
 ```
