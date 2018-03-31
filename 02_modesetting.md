@@ -176,3 +176,148 @@ compatible with `resources->crtcs[0]`; if bit 1 is set, it's compatible with
 ## The Pipeline
 
 ![DRM Pipeline](./02_pipeline.svg)
+
+The solid arrows represent data flows, and the dashed one represents
+configuration information.
+
+We're going to keep things sane, and have each CRTC only drive 1 connector each.
+We need to keep some extra state for our connectors, so we'll add our own
+struct for that.
+
+## Finding a CRTC+Encoder combo
+
+We'll need to loop through each of the encoders for every connector, and try
+and find a CRTC which is compatible, and is also not taken.
+
+```c
+static uint32_t find_crtc(int drm_fd, drmModeRes *res, drmModeConnector *conn,
+		uint32_t *taken_crtcs)
+{
+	for (int i = 0; i < conn->count_encoders; ++i) {
+		drmModeEncoder *enc = drmModeGetEncoder(drm_fd, conn->encoders[i]);
+		if (!enc)
+			continue;
+
+		for (int i = 0; i < res->count_crtcs; ++i) {
+			uint32_t bit = 1 << i;
+			// Not compatible
+			if ((enc->possible_crtcs & bit) == 0)
+				continue;
+
+			// Already taken
+			if (*taken_crtcs & bit)
+				continue;
+
+			drmModeFreeEncoder(enc);
+			*taken_crtcs |= bit;
+			return res->crtcs[i];
+		}
+
+		drmModeFreeEncoder(enc);
+	}
+
+	return 0;
+}
+```
+
+This solution doesn't actually guarantee us the optimum of the most CRTCs+Encoders
+matched, but gives us a decent solution without a lot of work.
+
+For the more computer science savvy readers, matching these CRTCs and Encoders
+is an NP-complete, and is an example of the Boolean satisfiability problem. The
+problem is small enough that you could just perform an exhaustive search,
+though.
+
+## Allocating a Framebuffer
+
+This is kind of a big deal, and is the cause of much contention between the
+open source drivers and Nvidia's proprietary driver. There are a lot of
+driver-specfic code related to this, but we're going to (sort-of) sidestep that
+issue right now, and do the lazy solution.
+
+DRM provides something called a "dumb buffer", which is basically what it
+sounds like. It's the bare minimum of what could be provided and provides no
+hardware acceleration, but doesn't require anything driver specific. We can
+mmap it to userspace, and do software rendering with it, though.
+
+We're eventually going to allocate these properly using libraries like libgbm,
+but this article already has way too many difficult new concepts as is.
+
+libdrm doesn't provide wrappers for these, so we'll have to call the ioctls
+ourselves. We'll create a wrapper struct for the framebuffer information.
+```c
+struct dumb_framebuffer {
+	uint32_t id;
+	uint32_t width;
+	uint32_t height;
+	uint32_t stride;
+	uint32_t handle;
+	uint64_t size;
+
+	uint8_t *data;
+};
+```
+First, we create the buffer and get its driver-specific handle:
+```c
+struct drm_mode_create_dumb create = {
+	.width = width,
+	.height = height,
+	.bpp = 32,
+};
+
+drmIoctl(drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &create);
+```
+From here, we can create our DRM framebuffer object.
+```c
+uint32_t handles[4] = { fb->handle };
+uint32_t strides[4] = { fb->stride };
+uint32_t offsets[4] = { 0 };
+
+uint32_t fb_id;
+drmModeAddFB2(drm_fd, width, height, DRM_FORMAT_XRGB8888,
+	handles, strides, offsets, &fb_id, 0);
+```
+You'll notice that we're using arrays of 4 elements. This is because
+drmModeAddFB2 also supports multi-planar formats, which can have up to 4
+buffers. We only need the 1, so we can just set the other 3 to 0.
+
+Now we have to prepare the buffer for being mmaped.
+```c
+struct drm_mode_map_dumb map = { .handle = create.handle };
+drmIoctl(drm_fd, DRM_IOCTL_MODE_MAP_DUMB, &map);
+```
+And finally perform that mmap:
+```c
+uint8_t *data = mmap(0, create.size, PROT_READ | PROT_WRITE, MAP_SHARED,
+	drm_fd, map.offset);
+```
+We can now write to the memory, just like any other.
+
+## Performing the Modeset
+
+Now that we have all of the pieces together, now it's as easy as calling
+```c
+drmModeSetCrtc(drm_fd, conn->crtc_id, conn->fb.id, 0, 0,
+	&conn->id, 1, &conn->mode);
+```
+
+This will display your framebuffer to the monitor, and we can draw whatever
+we want to.
+
+This won't work if we try to run our program inside Xorg or a Wayland
+Compositor.  You'll need to change to a new virtual terminal and run it there.
+
+It's also a good idea to save the old CRTC configuration, and restore it
+once we're done, otherwise, once our program exits, the virtual terminal
+display will be messed up. You can fix it by switching to another virtual
+terminal and then back, though.
+
+---
+
+If you ran my example program, you probably noticed that there is horrible
+screen tearing. This is because we're running completely unsynchronised
+to our monitor's refresh rate, and we're displaying the framebuffer
+in a half-drawn state.
+
+Next time, we're going to look at trying to remedy this with double
+buffering and drawing on vertical syncs.
