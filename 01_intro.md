@@ -79,7 +79,7 @@ or a lone developer. Only the big players like Gnome or KDE have the resources
 to write this sort of stuff themselves, and using a library will seriously save
 you years of development time.
 
-I'd reccomend wlroots, but there may be some bias in that.
+I'd recomend wlroots, but there may be some bias in that.
 
 ## Moving on
 
@@ -90,7 +90,7 @@ Not everybody's writing a Wayland Compositor. DRM can be used to draw whatever
 you want. For example, [mpv](https://mpv.io/) is capable of playing videos
 directly to your monitor using DRM.
 
-Maybe you want to write their own Wayland Compositor library to rival wlroots?
+Maybe you want to write your own Wayland Compositor library to rival wlroots?
 
 Also, other wlroots developers have said that most of my code touches a lot of
 arcane stuff, and they don't truly understand what's going on, and why things
