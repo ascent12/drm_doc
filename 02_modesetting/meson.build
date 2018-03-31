@@ -6,6 +6,8 @@ project('02_intro', 'c',
   ],
 )
 
+add_project_arguments('-D_POSIX_C_SOURCE=200809L', language: 'c')
+
 executable('02_intro', 'src/main.c', 'src/util.c',
   dependencies: dependency('libdrm')
 )
