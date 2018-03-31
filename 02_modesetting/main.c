@@ -14,14 +14,14 @@
 #include "util.h"
 
 struct dumb_framebuffer {
-	uint32_t id;
+	uint32_t id;     // DRM object ID
 	uint32_t width;
 	uint32_t height;
 	uint32_t stride;
-	uint32_t handle;
-	uint64_t size;
+	uint32_t handle; // driver-specific handle
+	uint64_t size;   // size of mapping
 
-	uint8_t *data;
+	uint8_t *data;   // mmapped data we can write to
 };
 
 struct connector {

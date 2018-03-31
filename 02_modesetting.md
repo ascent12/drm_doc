@@ -247,14 +247,14 @@ libdrm doesn't provide wrappers for these, so we'll have to call the ioctls
 ourselves. We'll create a wrapper struct for the framebuffer information.
 ```c
 struct dumb_framebuffer {
-	uint32_t id;
+	uint32_t id;     // DRM object ID
 	uint32_t width;
 	uint32_t height;
 	uint32_t stride;
-	uint32_t handle;
-	uint64_t size;
+	uint32_t handle; // driver-specific handle
+	uint64_t size;   // size of mapping
 
-	uint8_t *data;
+	uint8_t *data;   // mmapped data we can write to
 };
 ```
 First, we create the buffer and get its driver-specific handle:
@@ -266,6 +266,9 @@ struct drm_mode_create_dumb create = {
 };
 
 drmIoctl(drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &create);
+fb->handle = create.handle;
+fb->stride = create.pitch;
+fb->size = create.size;
 ```
 From here, we can create our DRM framebuffer object.
 ```c
@@ -275,7 +278,7 @@ uint32_t offsets[4] = { 0 };
 
 uint32_t fb_id;
 drmModeAddFB2(drm_fd, width, height, DRM_FORMAT_XRGB8888,
-	handles, strides, offsets, &fb_id, 0);
+	handles, strides, offsets, &fb->id, 0);
 ```
 You'll notice that we're using arrays of 4 elements. This is because
 drmModeAddFB2 also supports multi-planar formats, which can have up to 4
@@ -283,12 +286,12 @@ buffers. We only need the 1, so we can just set the other 3 to 0.
 
 Now we have to prepare the buffer for being mmaped.
 ```c
-struct drm_mode_map_dumb map = { .handle = create.handle };
+struct drm_mode_map_dumb map = { .handle = fb->handle };
 drmIoctl(drm_fd, DRM_IOCTL_MODE_MAP_DUMB, &map);
 ```
 And finally perform that mmap:
 ```c
-uint8_t *data = mmap(0, create.size, PROT_READ | PROT_WRITE, MAP_SHARED,
+fb->data = mmap(0, fb->size, PROT_READ | PROT_WRITE, MAP_SHARED,
 	drm_fd, map.offset);
 ```
 We can now write to the memory, just like any other.
