@@ -42,6 +42,19 @@ We already have the framebuffer allocation code from the last example, so we
 just need to call it again. And once we've finished our frame, we call
 drmModeSetCrtc to set it to use the back buffer.
 
+```c
+struct dumb_framebuffer *fb = conn->back;
+
+// Draw some stuff!
+
+drmModeSetCrtc(drm_fd, conn->crtc_id, fb->id, 0, 0,
+	&conn->id, 1, &conn->mode);
+
+// Swap buffers
+conn->back = conn->front;
+conn->front = fb;
+```
+
 This solution isn't perfect though. If we happen to swap the buffers during
 the read period, it can still tear.
 
