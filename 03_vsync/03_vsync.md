@@ -118,27 +118,9 @@ static void page_flip_handler(int drm_fd, unsigned sequence, unsigned tv_sec,
 	(void)tv_usec;
 
 	struct connector *conn = data;
-
-	conn->colour[conn->inc] += 15;
-	conn->colour[conn->dec] -= 15;
-
-	if (conn->colour[conn->dec] == 0) {
-		conn->dec = conn->inc;
-		conn->inc = (conn->inc + 2) % 3;
-	}
-
 	struct dumb_framebuffer *fb = &conn->fb;
 
-	for (uint32_t y = 0; y < fb->height; ++y) {
-		uint8_t *row = fb->data + fb->stride * y;
-
-		for (uint32_t x = 0; x < fb->width; ++x) {
-			row[x * 4 + 0] = conn->colour[0];
-			row[x * 4 + 1] = conn->colour[1];
-			row[x * 4 + 2] = conn->colour[2];
-			row[x * 4 + 3] = conn->colour[3];
-		}
-	}
+	// Draw some stuff!
 
 	if (drmModePageFlip(drm_fd, conn->crtc_id, fb->id,
 			DRM_MODE_PAGE_FLIP_EVENT, conn) < 0) {
@@ -170,8 +152,8 @@ framebuffer after the monitor read ends. We were just telling it to use the buff
 that was already there.
 
 So once we've finished drawing on our back buffer, we want to page flip it.
-This will be sure that we never show a partially drawn frame, swap buffers
-**during** the monitor read, and if we're too slow to draw the frame, the front
+This will be sure that we never show a partially drawn frame or swap buffers
+during the monitor read, and if we're too slow to draw the frame, the front
 buffer will remain unchanged.
 
 Running our program through valgrind (just to slow it down), you'll see that
