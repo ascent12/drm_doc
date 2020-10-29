@@ -103,7 +103,7 @@ using `ARGB8888` and wanted write the colour
 [#112233](http://www.color-hex.com/color/112233)[100], in memory, it would look
 like
 ```c
-uint8_t pixel[4] = { 0xff, 0x33, 0x22, 0x11 };
+uint8_t pixel[4] = { 0x33, 0x22, 0x11, 0xFF };
 ```
 
 ## CRTCs
