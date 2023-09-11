@@ -11,6 +11,19 @@ when we're dealing with the TTY.
 There are probably still a lot of minor spelling and grammatical mistakes. Any
 feedback on the articles or fixes are appreciated.
 
+**Sidenote:**
+If you want a more featurful example, then please see
+[daniels/kms-quads](https://gitlab.freedesktop.org/daniels/kms-quads). As in
+addition to implementing what is implemented here, it also implements:
+- GPU accelaration
+- Atomic updates (only updates one portion of a screen rathor then every screen
+  which can save battery life)
+- Real hotplugging support via libudev
+- Support for unprivaleged usage
+- Keyboard input via libinput
+The only disadvantage from  using this repository to learn DRM is that it is
+nowhere nearly as well documented, with only a few comments.
+
 ---
 
 Dependencies:
