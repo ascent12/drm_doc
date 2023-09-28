@@ -12,18 +12,22 @@ There are probably still a lot of minor spelling and grammatical mistakes. Any
 feedback on the articles or fixes are appreciated.
 
 **Sidenote:**
-If you want a more featurful example, then please see
-[daniels/kms-quads](https://gitlab.freedesktop.org/daniels/kms-quads). As in
-addition to implementing what is implemented here, it also implements:
+If you want a more featurful example, then there are 2 main sources of truth as,
+in addition to implementing what is implemented here, they also implement:
 - GPU accelaration
 - Atomic updates (only updates one portion of a screen rathor then every screen
   which can save battery life)
 - Real hotplugging support via libudev
 - Support for unprivaleged usage
 - Keyboard input via libinput
-
-The only disadvantage from  using this repository to learn DRM is that it is
-nowhere nearly as well documented, with only a few comments.
+They are:
+- [CuarzoSoftware/SRM](https://github.com/CuarzoSoftware/SRM) - A library with
+  good docs and several examples as well as a few more features (like hardware
+  cursors), it is also well maintained.
+- [daniels/kms-quads](https://gitlab.freedesktop.org/daniels/kms-quads) - A full
+  example repository, this is not updated, nowhere nearly as well documented
+  (only a few comments) and you must understand the code as it is a full example
+  that you must fork rathor then a library.
 
 ---
 
