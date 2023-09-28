@@ -20,6 +20,7 @@ in addition to implementing what is implemented here, they also implement:
 - Real hotplugging support via libudev
 - Support for unprivaleged usage
 - Keyboard input via libinput
+
 They are:
 - [CuarzoSoftware/SRM](https://github.com/CuarzoSoftware/SRM) - A library with
   good docs and several examples as well as a few more features (like hardware
